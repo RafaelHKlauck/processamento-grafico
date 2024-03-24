@@ -8,10 +8,17 @@ using namespace std;
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
 
-int setupTrianglesGeometry();
+int setupGeometry();
 
-const GLuint WIDTH = 800, HEIGHT = 600;
+const GLuint WIDTH = 600, HEIGHT = 600;
 
+const int exerciseANumberOfPoints = 10; // 8 pontos para o octogono e 2 para o centro
+const int exerciseBNumberOfPoints = 7; // 5 pontos para o pentagono e 2 para o centro
+const int exerciseCAndDNumberOfPoints = 1000; // 1000 pontos para o circulo
+const int exerciseENumberOfPoints = 12; // 10 pontos para estrela e 2 para o centro
+
+const int numberOfPoints = exerciseENumberOfPoints; // Alterar para a variável correspondente ao exercício
+const float pi = 3.14159;
 int main()
 {
 	glfwInit();
@@ -43,14 +50,16 @@ int main()
 	glViewport(0, 0, width, height);
 
 
-	Shader shader("exercicio5/shaders/helloTriangle.vs", "exercicio5/shaders/helloTriangle.fs");
+	Shader shader("exercicio6/shaders/helloTriangle.vs", "exercicio6/shaders/helloTriangle.fs");
 
-	GLuint VAO = setupTrianglesGeometry();
+	GLuint VAO = setupGeometry();
 
 	GLint colorLoc = glGetUniformLocation(shader.ID, "inputColor");
 	
 	shader.Use();
-	
+
+	// Exercicio a - octogono
+
 	while (!glfwWindowShouldClose(window))
 	{
 		glfwPollEvents();
@@ -63,33 +72,18 @@ int main()
 
 		glBindVertexArray(VAO);
 
-		glUniform4f(colorLoc, 0.0f, 0.0f, 1.0f, 1.0f); //enviando cor para vari�vel uniform inputColor
+		glUniform4f(colorLoc, 0.0f, 1.0f, 1.0f, 1.0f); //enviando cor para vari�vel uniform inputColor
 
 		// Chamada de desenho - drawcall
 
-		// Exercicio a
-		// Poligono Preenchido - GL_TRIANGLES
-		// glDrawArrays(GL_TRIANGLES, 0, 6); // numero de vertices a serem processados
+		// Exercicio a(octogono) e b(pentagono)
+		glDrawArrays(GL_TRIANGLE_FAN, 0, numberOfPoints);
 
-		// Exercicio b
-		// Desenhar só pointos usar GL_POINTS
-		// glDrawArrays(GL_POINTS, 0, 6);
+		// Exercicio c(pac-man) - desenhando um circulo removendo um pedaço
+		// glDrawArrays(GL_TRIANGLE_FAN, 0, numberOfPoints * 0.9);
 
-		// Exercicio c
-		// Desenhar só contorno usar GL_LINE_LOOP
-		// glDrawArrays(GL_LINE_LOOP, 0, 3);
-		// glDrawArrays(GL_LINE_LOOP, 3, 3);
-
-		// Exercicio d
-		glUniform4f(colorLoc, 0.0f, 0.0f, 1.0f, 1.0f); //enviando cor para vari�vel uniform inputColor
-		glDrawArrays(GL_TRIANGLES, 0, 6); // numero de vertices a serem processados
-
-		glUniform4f(colorLoc, 1.0f, 0.0f, 0.0f, 1.0f); //enviando cor para vari�vel uniform inputColor
-		glDrawArrays(GL_POINTS, 0, 6);
-
-		glUniform4f(colorLoc, 0.0f, 1.0f, 0.0f, 1.0f); //enviando cor para vari�vel uniform inputColor
-		glDrawArrays(GL_LINE_LOOP, 0, 3);
-		glDrawArrays(GL_LINE_LOOP, 3, 3);
+		// Exercicio d(fatia de pizza) - desenhando um circulo removendo um pedaço
+		// glDrawArrays(GL_TRIANGLE_FAN, 0, numberOfPoints * 0.1);
 
 		glBindVertexArray(0); //Desconectando o buffer de geometria
 
@@ -108,25 +102,44 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		glfwSetWindowShouldClose(window, GL_TRUE);
 }
 
-int setupTrianglesGeometry()
+int setupGeometry()
 {
-	GLfloat vertices[] = {
-		// x    y    z
-		// Primeiro Triangulo
-		-0.5, 0.5, 0.5, //v0
-		 0.0, 0.0, 0.0, //v1
- 		 0.5, 0.5, 0.0, //v2 
-		 // Segundo Triangulo
-		 0.0, 0.0, 0.0, //v3
-		 -0.5, -0.5, 0.0, //v4
-		 0.5, -0.5, 0.0, //v5
-	};
+	GLfloat* vertices;
+	const int multipliedNumberOfPoints = 3 * numberOfPoints;
+	vertices = new GLfloat[multipliedNumberOfPoints];
 
+  // x y z do centro
+	vertices[0] = 0.0;
+	vertices[1] = 0.0;
+	vertices[2] = 0.0;
+
+	float angle = 0.0;
+	float angleIncrement = 2 * pi / (float)(numberOfPoints - 2);
+	float radius = 0.5;
+	float innerRadius = 0.3; // Usando para estrela
+	bool isOuterVertex = true; // Usando para estrela
+	for (int i = 3; i < multipliedNumberOfPoints; i += 3)
+	{
+		if (numberOfPoints == 12) {
+			// Estrela
+			if (isOuterVertex == false) {
+				radius = innerRadius;
+			} else {
+				radius = 0.5;
+			}
+				isOuterVertex = !isOuterVertex;
+		}
+		vertices[i] = radius * cos(angle);
+		vertices[i + 1] = radius * sin(angle);
+		vertices[i + 2] = 0.0;
+		angle += angleIncrement;
+	}
+	
 	GLuint VBO, VAO;
 	
 	glGenBuffers(1, &VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, multipliedNumberOfPoints * sizeof(vertices), vertices, GL_STATIC_DRAW);
 
 	glGenVertexArrays(1, &VAO);
 
