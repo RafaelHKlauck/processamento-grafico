@@ -58,8 +58,6 @@ int main()
 	
 	shader.Use();
 
-	// Exercicio a - octogono
-
 	while (!glfwWindowShouldClose(window))
 	{
 		glfwPollEvents();
@@ -76,7 +74,7 @@ int main()
 
 		// Chamada de desenho - drawcall
 
-		// Exercicio a(octogono) e b(pentagono)
+		// Exercicio a(octogono), b(pentagono) e e(estrela)
 		glDrawArrays(GL_TRIANGLE_FAN, 0, numberOfPoints);
 
 		// Exercicio c(pac-man) - desenhando um circulo removendo um pedaço
