@@ -84,7 +84,7 @@ int main()
 		glUniform4f(colorLoc, 0.0f, 0.0f, 0.0f, 1.0f);
 		glDrawArrays(GL_LINE_STRIP, 0, 8);
 
-		// Eye
+		// Face
 		glBindVertexArray(VAOFace);
 		glUniform4f(colorLoc, 0.0f, 0.0f, 0.0f, 1.0f);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
