@@ -5,27 +5,21 @@
 #include <glm/gtc/type_ptr.hpp>
 
 class SpriteAula {
-  private:
-    double lastTime; // Último tempo registrado
-    double interval = 0; // Intervalo desejado em segundos
-    
   public:
     SpriteAula() {} // Constructor
     ~SpriteAula(); // Destructor
-    void initialize(GLuint textId, glm::vec3 pos = glm::vec3(0.0, 0.0, 0.0), glm::vec3 scale = glm::vec3(1.0, 1.0, 1.0), float angle = 0.0); 
+    void initialize(GLuint texID, glm::vec3 pos = glm::vec3(0.0, 0.0, 0.0), glm::vec3 scale = glm::vec3(1.0, 1.0, 1.0), float angle = 0.0); 
     void draw();
     void finalize();
-    void setMovementInterval(double interval) { this->interval = interval; }
+    void update();
     void moveRight();
     void moveUp();
-    void moveDown();
-    void setShader(Shader *shader) { this->shader = shader; }
+    void moveDown(); 
+    void moveLeft();
+    inline void setShader(Shader* shader) { this->shader = shader; }
 
 
   protected:
-    void update();
-    void rotateUp();
-    void rotateDown();
     GLuint VAO; // identificador do buffer de geometria, indicando os atributos dos vértices
     GLuint texID; // identificador do buffer de textura
 
